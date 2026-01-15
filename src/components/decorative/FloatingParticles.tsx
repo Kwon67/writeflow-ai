@@ -1,82 +1,75 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 
 interface FloatingParticlesProps {
   count?: number;
-  colors?: string[];
 }
 
-export default function FloatingParticles({
-  count = 15,
-  colors = ['bg-purple-400', 'bg-blue-400', 'bg-cyan-400']
-}: FloatingParticlesProps) {
+// Use CSS animations instead of Framer Motion for better performance
+const FloatingParticles = memo(function FloatingParticles({ count = 10 }: FloatingParticlesProps) {
   const [particles, setParticles] = useState<Array<{
     id: number;
     size: number;
     x: number;
     y: number;
-    color: string;
     duration: number;
     delay: number;
     opacity: number;
-    xMove: number;
   }>>([]);
 
   const initialized = useRef(false);
 
   useEffect(() => {
-    // Only initialize once
     if (!initialized.current) {
       initialized.current = true;
+      // Reduce particle count for performance
+      const actualCount = Math.min(count, 12);
       setParticles(
-        Array.from({ length: count }, (_, i) => ({
+        Array.from({ length: actualCount }, (_, i) => ({
           id: i,
-          size: Math.random() * 16 + 4, // 4px to 20px
-          x: Math.random() * 100, // 0% to 100%
+          size: Math.random() * 8 + 4,
+          x: Math.random() * 100,
           y: Math.random() * 100,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          duration: Math.random() * 10 + 15, // 15s to 25s
+          duration: Math.random() * 10 + 20,
           delay: Math.random() * 5,
-          opacity: Math.random() * 0.3 + 0.1, // 0.1 to 0.4
-          xMove: Math.random() * 50 - 25,
+          opacity: Math.random() * 0.2 + 0.1,
         }))
       );
     }
-  });
+  }, [count]);
 
-  if (particles.length === 0) {
-    return null;
-  }
+  if (particles.length === 0) return null;
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       {particles.map((particle) => (
-        <motion.div
+        <div
           key={particle.id}
-          className={`absolute ${particle.color} rounded-full`}
+          className="absolute rounded-full bg-white/20 will-change-transform"
           style={{
             width: particle.size,
             height: particle.size,
             left: `${particle.x}%`,
             top: `${particle.y}%`,
             opacity: particle.opacity,
-          }}
-          animate={{
-            y: [0, -100, 0],
-            x: [0, particle.xMove, 0],
-            scale: [1, 1.2, 1],
-            opacity: [particle.opacity, particle.opacity * 1.5, particle.opacity],
-          }}
-          transition={{
-            duration: particle.duration,
-            repeat: Infinity,
-            delay: particle.delay,
-            ease: 'easeInOut',
+            animation: `float-particle ${particle.duration}s ease-in-out infinite`,
+            animationDelay: `${particle.delay}s`,
           }}
         />
       ))}
+      <style jsx>{`
+        @keyframes float-particle {
+          0%, 100% {
+            transform: translate3d(0, 0, 0);
+          }
+          50% {
+            transform: translate3d(0, -30px, 0);
+          }
+        }
+      `}</style>
     </div>
   );
-}
+});
+
+export default FloatingParticles;

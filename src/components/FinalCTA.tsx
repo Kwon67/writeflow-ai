@@ -36,17 +36,17 @@ export default function FinalCTA({ onStartTrial }: FinalCTAProps) {
 
   return (
     <section className="relative py-32 overflow-hidden bg-[#030014]">
-      {/* Animated gradient background */}
+      {/* Static gradient background - optimized */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-linear-to-t from-purple-950/40 via-transparent to-blue-950/40" />
-        <div className="absolute top-0 left-1/3 w-[600px] h-[600px] bg-purple-600/20 rounded-full blur-[150px] animate-pulse" />
-        <div className="absolute bottom-0 right-1/3 w-[600px] h-[600px] bg-blue-600/20 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-linear-conic from-purple-600/10 via-blue-600/10 to-purple-600/10 rounded-full blur-[100px] animate-spin" style={{ animationDuration: '30s' }} />
+        <div className="absolute top-0 left-1/3 w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[80px]" />
+        <div className="absolute bottom-0 right-1/3 w-[400px] h-[400px] bg-blue-600/15 rounded-full blur-[80px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[80px]" />
       </div>
 
       {/* Decorative elements */}
       <BackgroundOrbs variant="cta" />
-      <FloatingParticles count={20} />
+      <FloatingParticles count={8} />
       <GridPattern opacity={0.02} />
 
       {/* Radial gradient overlay */}

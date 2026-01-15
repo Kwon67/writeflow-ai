@@ -1,9 +1,9 @@
 'use client';
 
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Sparkles, Play, ArrowRight, Users, FileText, Star, Zap } from 'lucide-react';
 import Button from './ui/Button';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, memo } from 'react';
 import BackgroundOrbs from './decorative/BackgroundOrbs';
 import FloatingParticles from './decorative/FloatingParticles';
 import GridPattern from './decorative/GridPattern';
@@ -13,7 +13,7 @@ interface HeroProps {
   onStartTrial: () => void;
 }
 
-const TypewriterText = ({ text, delay = 0 }: { text: string; delay?: number }) => {
+const TypewriterText = memo(({ text, delay = 0 }: { text: string; delay?: number }) => {
   const [displayText, setDisplayText] = useState('');
   const [showCursor, setShowCursor] = useState(true);
 
@@ -40,52 +40,66 @@ const TypewriterText = ({ text, delay = 0 }: { text: string; delay?: number }) =
       {showCursor && <span className="animate-pulse text-purple-400">|</span>}
     </span>
   );
-};
+});
 
-const AnimatedCounter = ({ target, suffix = '', duration = 2 }: { target: number; suffix?: string; duration?: number }) => {
-  const count = useMotionValue(0);
-  const rounded = useTransform(count, (latest) => {
-    if (target >= 1000) return Math.floor(latest).toLocaleString();
-    if (target < 10) return latest.toFixed(1);
-    return Math.floor(latest).toString();
-  });
+TypewriterText.displayName = 'TypewriterText';
+
+const AnimatedCounter = memo(({ target, suffix = '' }: { target: number; suffix?: string }) => {
   const [displayValue, setDisplayValue] = useState('0');
 
   useEffect(() => {
-    const controls = animate(count, target, { duration, ease: 'easeOut' });
-    const unsubscribe = rounded.on('change', (v) => setDisplayValue(v));
-    return () => {
-      controls.stop();
-      unsubscribe();
+    let startTime: number;
+    const duration = 1500;
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = target * eased;
+
+      if (target >= 1000) {
+        setDisplayValue(Math.floor(current).toLocaleString());
+      } else if (target < 10) {
+        setDisplayValue(current.toFixed(1));
+      } else {
+        setDisplayValue(Math.floor(current).toString());
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
     };
-  }, [count, target, duration, rounded]);
+
+    requestAnimationFrame(animate);
+  }, [target]);
 
   return <span>{displayValue}{suffix}</span>;
-};
+});
+
+AnimatedCounter.displayName = 'AnimatedCounter';
 
 export default function Hero({ onWatchDemo, onStartTrial }: HeroProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#030014]">
-      {/* Animated gradient background */}
+      {/* Static gradient background - no animations for performance */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-linear-to-br from-purple-950/50 via-transparent to-blue-950/50" />
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-conic from-purple-600/10 via-blue-600/10 to-purple-600/10 rounded-full blur-[100px] animate-spin" style={{ animationDuration: '20s' }} />
+        <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[100px]" />
+        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-blue-600/15 rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[80px]" />
       </div>
 
-      {/* Decorative elements */}
+      {/* Decorative elements - reduced count */}
       <BackgroundOrbs variant="hero" />
-      <FloatingParticles count={30} />
+      <FloatingParticles count={8} />
       <GridPattern opacity={0.02} />
 
       {/* Radial gradient overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#030014_70%)]" />
 
-      <div ref={containerRef} className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
         {/* Announcement Badge */}
         <motion.div
           initial={{ opacity: 0, y: -20, scale: 0.9 }}
@@ -241,13 +255,11 @@ export default function Hero({ onWatchDemo, onStartTrial }: HeroProps) {
             { icon: FileText, value: 10, suffix: 'M+', label: 'Words Generated', color: 'from-blue-500 to-blue-600' },
             { icon: Star, value: 4.9, suffix: '/5', label: 'User Rating', color: 'from-cyan-500 to-cyan-600' },
           ].map((stat, index) => (
-            <motion.div
+            <div
               key={index}
-              whileHover={{ y: -5, scale: 1.02 }}
-              transition={{ duration: 0.3 }}
-              className="relative group"
+              className="relative group hover:-translate-y-1 transition-transform duration-300 will-change-transform"
             >
-              <div className={`absolute -inset-0.5 bg-linear-to-r ${stat.color} rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500`} />
+              <div className={`absolute -inset-0.5 bg-linear-to-r ${stat.color} rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-300`} />
               <div className="relative glass rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-colors">
                 <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-linear-to-br ${stat.color} mb-4`}>
                   <stat.icon className="w-6 h-6 text-white" />
@@ -257,7 +269,7 @@ export default function Hero({ onWatchDemo, onStartTrial }: HeroProps) {
                 </div>
                 <div className="text-gray-400 text-sm font-medium">{stat.label}</div>
               </div>
-            </motion.div>
+            </div>
           ))}
         </motion.div>
 
@@ -348,9 +360,9 @@ export default function Hero({ onWatchDemo, onStartTrial }: HeroProps) {
                       className="flex items-center gap-3 p-4 rounded-xl bg-linear-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20"
                     >
                       <div className="flex gap-1">
-                        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0 }} className="w-2 h-2 rounded-full bg-purple-400" />
-                        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.2 }} className="w-2 h-2 rounded-full bg-blue-400" />
-                        <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ repeat: Infinity, duration: 0.6, delay: 0.4 }} className="w-2 h-2 rounded-full bg-cyan-400" />
+                        <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
+                        <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" style={{ animationDelay: '0.2s' }} />
+                        <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" style={{ animationDelay: '0.4s' }} />
                       </div>
                       <span className="text-sm text-gray-300">AI is generating your content...</span>
                     </motion.div>

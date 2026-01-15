@@ -83,18 +83,17 @@ export default function Pricing({ onStartTrial }: PricingProps) {
 
   return (
     <section className="relative py-32 overflow-hidden bg-[#030014]">
-      {/* Animated gradient background */}
+      {/* Static gradient background - optimized */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-linear-to-b from-blue-950/30 via-transparent to-purple-950/30" />
-        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-purple-600/15 rounded-full blur-[150px]" />
-        <div className="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[150px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyan-600/10 rounded-full blur-[120px]" />
+        <div className="absolute top-0 right-1/4 w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[80px]" />
+        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-blue-600/15 rounded-full blur-[80px]" />
       </div>
 
       {/* Decorative elements */}
       <BackgroundOrbs variant="section" />
       <GridPattern opacity={0.02} />
-      <FloatingParticles count={15} />
+      <FloatingParticles count={8} />
 
       {/* Radial gradient overlay */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#030014_80%)]" />

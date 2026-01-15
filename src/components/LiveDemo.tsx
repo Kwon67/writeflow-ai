@@ -119,17 +119,16 @@ export default function LiveDemo() {
 
   return (
     <section className="relative py-32 overflow-hidden bg-[#030014]">
-      {/* Animated gradient background */}
+      {/* Static gradient background - optimized */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-linear-to-b from-purple-950/30 via-transparent to-blue-950/30" />
-        <div className="absolute top-1/4 left-0 w-[600px] h-[600px] bg-purple-600/15 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-0 w-[600px] h-[600px] bg-blue-600/15 rounded-full blur-[150px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-cyan-600/10 rounded-full blur-[100px]" />
+        <div className="absolute top-1/4 left-0 w-[400px] h-[400px] bg-purple-600/15 rounded-full blur-[80px]" />
+        <div className="absolute bottom-1/4 right-0 w-[400px] h-[400px] bg-blue-600/15 rounded-full blur-[80px]" />
       </div>
 
       {/* Decorative elements */}
       <BackgroundOrbs variant="section" />
-      <FloatingParticles count={15} />
+      <FloatingParticles count={8} />
       <GridPattern opacity={0.02} />
 
       {/* Radial gradient overlay */}
