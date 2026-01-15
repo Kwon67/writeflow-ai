@@ -116,16 +116,11 @@ export default function Footer() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4"
+          className="pt-8 border-t border-gray-800 flex items-center justify-center"
         >
           <p className="text-sm text-gray-400">
             © 2026 WriteFlow AI. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 text-sm">
-            <span className="text-gray-400">
-              Made with AI for content creators worldwide
-            </span>
-          </div>
         </motion.div>
       </div>
     </footer>
